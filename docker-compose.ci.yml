@@ -1,0 +1,31 @@
+version: '3.3'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: src/Dockerfile
+    restart: on-failure
+    depends_on:
+      - db
+      - redis
+    environment:
+      REDIS_DSN: redis://redis:6379/
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: db_user
+      POSTGRES_PASSWORD: db_password
+      POSTGRES_DB: db_name
+    command: python manage.py runserver 0.0.0.0:8000
+
+  db:
+    image: postgres:15.2
+    restart: on-failure
+    environment:
+      - POSTGRES_USER=db_user
+      - POSTGRES_PASSWORD=db_password
+      - POSTGRES_DB=db_name
+
+  redis:
+    image: redis/redis-stack:7.2.0-RC1
+    restart: on-failure
